@@ -27,4 +27,3 @@ uv.lock
 
 # Local runtime
 comfyui.pid
-*.log
