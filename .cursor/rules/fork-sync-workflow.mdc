@@ -1,0 +1,56 @@
+---
+description: ComfyUI fork remotes, sync-from-upstream, never push to original repo
+alwaysApply: true
+---
+
+# ComfyUI fork workflow (abk234)
+
+This workspace is a **fork**, not a direct clone of upstream for pushing.
+
+## Remotes (do not change casually)
+
+| Remote | URL | Role |
+|---|---|---|
+| `origin` | `git@github.com:abk234/ComfyUI.git` | **Our fork** — all pushes go here |
+| `upstream` | `https://github.com/Comfy-Org/ComfyUI.git` | **Original** — fetch/merge only |
+
+- `upstream` push URL is disabled (`DISABLED_use_origin_fork_only`). Never push to upstream.
+- `master` tracks `origin/master`.
+
+## Sync latest upstream into our fork
+
+```bash
+./sync-from-upstream.sh
+```
+
+That script: `fetch upstream` → `merge upstream/master` → `push origin` only.
+
+Manual equivalent:
+
+```bash
+git fetch upstream
+git fetch origin
+git merge upstream/master --no-edit
+git push origin HEAD
+```
+
+Verify: `git rev-list --left-right --count upstream/master...origin/master`  
+→ left=`0` means fork has all upstream commits; right=`N` are our fork-only commits.
+
+## What stays on the fork only
+
+- Local helper scripts (`start-comfyui.sh`, `stop-comfyui.sh`, `check-comfyui.sh`, `setup-comfyui.sh`, `sync-from-upstream.sh`)
+- Workflow/download tooling, chrome extension, docs under this fork
+- Runtime ignored: `comfyui.pid`, `/output/`, `/models/`, venvs
+
+## Birthday-card work (eval)
+
+- Generate via ComfyUI UI when possible (PNG embeds workflow metadata; drag PNG onto canvas to reproduce).
+- Human index of favorites: `output/birthday_prompt_image_map.md` + `.json` (gitignored under `/output/`).
+- Prefer relation-specific messages + locked visual presentation; one relation at a time when iterating styles.
+
+## When user asks to “push” or “sync”
+
+1. Push → `origin` (fork) only.
+2. Sync with original → merge `upstream` into local/`origin`, never push to `upstream`.
+3. Keep working in this directory (preserve `models/`, venv, `output/`); do not re-clone unless asked.
